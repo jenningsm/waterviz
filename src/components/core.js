@@ -6,7 +6,7 @@ var sty = stys.style
 var fonts = require('../fonts.js').fonts
 
 module.exports = function(){
-  return el('div').style(
+  var title =  el('div').style(
     sty('width', '100%'),
     sty('text-align', 'center'),
     sty('line-height', '1.5'),
@@ -27,5 +27,10 @@ module.exports = function(){
     .content(
       'A comparison of domestic and agricultural water usage in California.'
     )
+  )
+
+  return el('div').content(
+    title,
+    el('water-viz')
   )
 }
