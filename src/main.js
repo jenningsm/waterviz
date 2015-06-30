@@ -27,8 +27,11 @@ html.content(
   require('./utils/scripts.js')(scripts)
 )
 
+var viz = require('./components/viz.js')()
+
 var pages = {
-  'index' : html
+  'index' : html,
+  'water-viz' : viz
 }
 
 require('./utils/generate.js')(pages)
