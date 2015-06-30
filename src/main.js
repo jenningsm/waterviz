@@ -15,7 +15,9 @@ var body = el('body').style({
 )
 
 var scripts = [
-
+// 'bower_components/angular/angular.js',
+// 'js/directives.js',
+// 'js/app.js'
 ]
 
 
@@ -27,8 +29,11 @@ html.content(
   require('./utils/scripts.js')(scripts)
 )
 
+//var viz = require('./components/viz.js')()
+
 var pages = {
-  'index' : html
+  'index' : html,
+//  'water-viz' : viz
 }
 
 require('./utils/generate.js')(pages)

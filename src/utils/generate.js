@@ -18,6 +18,6 @@ module.exports = function(pages, cssName){
   }
   
   for(var i = 0; i < keys.length; i++){
-    fs.writeFileSync((keys[i] !== 'index' ? 'pages/' : '') + keys[i] + '.html', p.html[i]);
+    fs.writeFileSync((keys[i] !== 'index' ? 'templates/' : '') + keys[i] + '.html', p.html[i]);
   }
 }
