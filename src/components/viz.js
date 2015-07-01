@@ -38,11 +38,12 @@ function center(){
   var box = svgGen(((1 - 2 * catWidth) * 100) + '%', '100%', 'blue') 
   box().style(
     sty('height', '100%'),
-    sty('width', ((1 - catWidth) * 100) + '%')
+    sty('width', ((1) * 100) + '%'),
+    sty('position', 'absolute')
   )
 
-  box(.25, .5, .1).attribute('id', 'left-circle')
-  box(.75, .5, .05).attribute('id', 'right-circle')
+  box('{{ 33 + &quot;%&quot; }}', '{{ .5 }}', '{{ values.domestic / 100}}')
+  box('{{ 67 + &quot;%&quot; }}', '{{ .5 }}', '{{ values.agricultural / 200 }}')
   return box()
 }
 
@@ -53,6 +54,9 @@ function category(side){
     sty('height', '100%'),
     sty('width', (100 * catWidth) + "%"),
     sty('font-size', '1.3em'),
-    stys.flex('column', 'flex-start', 'flex-' + (side === 'left' ? 'start' : 'end'))
+    stys.flex('column', 'flex-start', 'flex-' + (side === 'left' ? 'start' : 'end')),
+    sty('position', 'absolute'),
+    sty(side, '0'),
+    sty('z-index', '1')
   )
 }

@@ -4,7 +4,8 @@ var app = angular.module('directives', [])
 app.directive('waterViz', function(){
   return {
     restrict : 'E',
-    templateUrl : 'templates/water-viz.html'
+    templateUrl : 'templates/water-viz.html',
+    controller : 'VizController'
   }
 })
 

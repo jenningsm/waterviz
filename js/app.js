@@ -27,16 +27,23 @@ app.controller('CatsController', ['$scope', 'Data', function($scope, data){
 
   data.getData($scope.domain).then(function(cats){
     $scope.cats = cats
-    $scope.current = cats[0].index
+    $scope.setCurrent(0)
   })
+
+  $scope.setCurrent = function(index){
+    $scope.current = index
+    $scope.$parent.values[$scope.domain] = $scope.cats[index].value
+  }
 
   $scope.color = function(index){
     return index === $scope.current ? 'blue' : 'black'
   }
 
-  $scope.setCurrent = function(index){
-    $scope.current = index
-  }
 
 }])
 
+app.controller('VizController', ['$scope', function($scope){
+
+  $scope.values = {} 
+
+}])

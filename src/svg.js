@@ -14,7 +14,8 @@ module.exports = function(width, height, color){
   var svg = el('svg').attribute({
     'viewBox' : '0 0 1 1',
     'xmlns' : 'http://www.w3.org/2000/svg',
-    'version' : '1.1'
+    'version' : '1.1',
+    'preserveAspectRatio' : 'xMidYMid slice'
   })
   .style({
     'height' : height,
@@ -25,9 +26,9 @@ module.exports = function(width, height, color){
   return function(x, y, r){
     if(x !== undefined){
       var circle = el('circle/').attribute({
-        'cx' : truncate(x, 2),
-        'cy' : truncate(y, 2),
-        'r' : truncate(r, 2),
+        'ng-attr-cx' : x,
+        'ng-attr-cy' : y,
+        'ng-attr-r' : r,
       })
       svg.content(circle)
       return circle
