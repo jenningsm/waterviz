@@ -18,6 +18,15 @@ app.directive('categories', function(){
     controller : 'CatsController'
   }
 })
+app.directive('category', function(){
+  return {
+    restrict : 'E',
+    templateUrl : 'templates/category.html',
+    scope : {
+      category : '='
+    }
+  }
+})
 
 function outer(templateUrl){
   return {

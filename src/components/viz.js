@@ -38,15 +38,14 @@ function half(side){
     sty('height', '100%'),
     sty('width', ((1 - catWidth) * 100) + '%')
   ).content(
-    'circle spot ' + side
   )
-  var categoriesSpot = el('div').style(
+  var categoriesSpot = el('categories', {
+    'domain' : side === 'left' ? 'domestic' : 'agricultural'
+  }).style(
     sty('height', '100%'),
     sty('width', (100 * catWidth) + "%"),
+    sty('font-size', '1.3em'),
     stys.flex('column', 'flex-start', 'flex-' + (side === 'left' ? 'start' : 'end'))
-  )
-  .content(
-    el('categories', {'domain' : side === 'left' ? 'domestic' : 'agricultural'}) 
   )
 
   var together = [categoriesSpot, circleSpot]

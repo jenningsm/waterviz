@@ -34,7 +34,8 @@ var viz = require('./components/viz.js')()
 var pages = {
   'index' : html,
   'water-viz' : viz,
-  'categories' : require('./components/categories.js')()
+  'categories' : require('./components/categories.js')(),
+  'category' : require('./components/category.js')()
 }
 
 require('./utils/generate.js')(pages)
