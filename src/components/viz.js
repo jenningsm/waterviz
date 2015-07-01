@@ -4,6 +4,7 @@ var el = require('../utils/el.js')
 var stys = require('../styles.js')
 var sty = stys.style
 var fonts = require('../fonts.js').fonts
+var svgGen = require('../svg.js')
 
 module.exports = function(){
   var box = el('div').style(
@@ -24,22 +25,29 @@ function whole(){
     stys.dims('100%', '100%'),
     stys.flex('row')
   ).content(
-    half('left'),
-    half('right')
+    category('left'),
+    center(),
+    category('right')
   )
 }
 
 
 var catWidth = .1
 
-function half(side){
-
-  var circleSpot = el('div').style(
+function center(){
+  var box = svgGen(((1 - 2 * catWidth) * 100) + '%', '100%', 'blue') 
+  box().style(
     sty('height', '100%'),
     sty('width', ((1 - catWidth) * 100) + '%')
-  ).content(
   )
-  var categoriesSpot = el('categories', {
+
+  box(.25, .5, .1).attribute('id', 'left-circle')
+  box(.75, .5, .05).attribute('id', 'right-circle')
+  return box()
+}
+
+function category(side){
+  return el('categories', {
     'domain' : side === 'left' ? 'domestic' : 'agricultural'
   }).style(
     sty('height', '100%'),
@@ -47,15 +55,4 @@ function half(side){
     sty('font-size', '1.3em'),
     stys.flex('column', 'flex-start', 'flex-' + (side === 'left' ? 'start' : 'end'))
   )
-
-  var together = [categoriesSpot, circleSpot]
-  var order = [together[side === 'right' ? 1 : 0], together[side ==='right' ? 0 : 1]]
-
-  return el('div').style(
-    sty('width', '50%'),
-    stys.flex('row')
-  ).content(
-    order
-  )
-
 }
