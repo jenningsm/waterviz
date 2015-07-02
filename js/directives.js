@@ -9,19 +9,6 @@ app.directive('waterViz', function(){
   }
 })
 
-/*
-app.directive('waterCircle', function(){
-  return {
-    restrict : 'E',
-    templateUrl : 'templates/water-circle.html',
-    scope : {
-      center : '=',
-      mradius : '='
-    },
-    replace : true
-  }
-})*/
-
 app.directive('graphic', ['$window', function($window){
   return {
     restrict : 'E',
@@ -39,6 +26,31 @@ app.directive('graphic', ['$window', function($window){
       var win = angular.element($window);
       win.bind("resize", getAspectRatio)
       getAspectRatio()
+
+      var leftCircle = el[0].children[0].children[0]
+      var rightCircle = el[0].children[0].children[1]
+
+      scope.setLeft = function(r){
+        leftCircle.setAttribute('r', r)
+      }
+      scope.setRight = function(r){
+        rightCircle.setAttribute('r', r)
+      }
+      var moveCircle = sequence({
+        'left' : function(x){
+          scope.setLeft(x / 200)
+        },
+        'right' : function(x){
+          scope.setRight(x / 200)
+        }
+      }, {'left' : .25, 'right' : .2 })
+    
+      scope.$watch('$parent.values', function(newv){
+    
+        moveCircle(newv)
+    
+      }, true)
+
     }
   }
 }])

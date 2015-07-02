@@ -65,23 +65,4 @@ app.controller('GraphicController', ['$scope', function($scope){
     return { 'left' : sizes.left * rat, 'right' : sizes.right * rat}
   }
 
-  var moveCircle = sequence({
-    'left' : function(x){
-      $scope.leftSize = x / 200
-    },
-    'right' : function(x){
-      $scope.rightSize = x / 200
-    }
-  }, {'left' : .25, 'right' : .2 })
-
-  $scope.$watch('$parent.values', function(newv){
-    var scaled = normalize(areas(newv))
-    $scope.leftSize = scaled.left
-    $scope.rightSize = scaled.right
-
-//    moveCircle(newv)
-
-  }, true)
-
-
 }])
