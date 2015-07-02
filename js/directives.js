@@ -9,7 +9,6 @@ app.directive('waterViz', function(){
   }
 })
 
-
 app.directive('categories', function(){
   return {
     restrict : 'E',

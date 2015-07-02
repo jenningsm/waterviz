@@ -9,24 +9,42 @@ app.directive('graphic', ['$window', function($window){
     link : function(scope, el){
 
       var maxSize = .75
+      var minSize = .55
 
-      function getScene(leftValue, rightValue){
+      function getScene(leftValue, rightValue, currentDist){
         function areaToRad(area){
           return Math.sqrt(2 * area)
         }
         var radii = [areaToRad(leftValue), areaToRad(rightValue)]
     
         var rat = Math.min(scope.aspectRatio, 1 / scope.aspectRatio)
-    
-        dist = 2 * Math.max(radii[0], radii[1]) / (maxSize * rat)
-    
-        var centerOffset = .5 * dist
-    
-        if(centerOffset !== 0){
-          var mult = Math.max(1, 2 * (radii[0] + radii[1]) / centerOffset)
-          centerOffset *= mult
-          dist *= mult
-        }
+   
+
+       //returns the distance required so that the larger of the two
+       //circles has an apparent size of size
+       function distanceForSize(size, radii){
+          return 2 * Math.max(radii[0], radii[1]) / (size * rat)
+       }
+
+       var apparentCenterOffset = 1 / 6
+       //returns the minimum distance required so the two circles don't overlap
+       function overlapDist(radii){
+         return 1.2 * .5 * (radii[0] + radii[1]) / apparentCenterOffset
+       }
+
+       var dist
+
+       var lowerDist = distanceForSize(maxSize, radii)
+       var upperDist = distanceForSize(minSize, radii)
+       var minDist = overlapDist(radii)
+       
+       if(currentDist < upperDist && currentDist > lowerDist && currentDist > minDist){
+         dist = currentDist
+       } else {
+         dist = Math.max(minDist, lowerDist)
+       }
+
+       var centerOffset = dist * apparentCenterOffset
     
         var ret = {
           'left-radius' : radii[0],
@@ -71,7 +89,7 @@ app.directive('graphic', ['$window', function($window){
       }
       function centerSetter(centerOffset){
         for(var i = 0; i < 2; i++){
-          circles[i].setAttribute('cx', .5 + ((1 / 3) * (i === 0 ? -1 : 1) * centerOffset) / distance)
+          circles[i].setAttribute('cx', .5 + (i === 0 ? -1 : 1) * centerOffset / distance)
         }
       }
 
@@ -91,7 +109,7 @@ app.directive('graphic', ['$window', function($window){
 
       scope.$watch('values', function(newv){
         if(newv.right !== undefined && newv.left !== undefined){
-          var newScene = getScene(newv.left, newv.right)
+          var newScene = getScene(newv.left, newv.right, oldScene.distance)
   
           function timeFunction(constant){
             return function(oldv, newv){

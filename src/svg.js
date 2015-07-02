@@ -35,11 +35,3 @@ module.exports = function(width, height, color, num){
 
   return svg
 }
-
-//truncated a number down to precision number of digits
-//past the decimal point
-function truncate(number, precision){
-  number = number * Math.pow(10, precision)
-  number = Math.round(number)
-  return number / Math.pow(10, precision)
-}
