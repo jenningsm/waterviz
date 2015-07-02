@@ -1,13 +1,15 @@
 {
   "domestic" : {
+    "total" : 20,
     "showers" : 3.1,
     "toilets" : 1.1,
     "lawns" : 10.4,
-    "fields" : 30
+    "leaks" : 4
   },
   "agricultural" : {
     "total" : 100.4,
     "alfafa" : 40.2,
+    "beans" : 55,
     "rice" : 14.3
   }
 }

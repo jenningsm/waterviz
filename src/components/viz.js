@@ -9,7 +9,7 @@ var svgGen = require('../svg.js')
 module.exports = function(){
   var box = el('div').style(
     sty('width', '100%'),
-    sty('height', '50%'),
+    sty('height', '70%'),
     sty('position', 'relative'),
     sty('background', 'beige')
   )
@@ -40,6 +40,7 @@ function category(side){
   return el('categories', {
     'domain' : side === 'left' ? 'domestic' : 'agricultural'
   }).style(
+    sty('margin', '.7em'),
     sty('height', '100%'),
     sty('width', (100 * catWidth) + "%"),
     sty('font-size', '1.3em'),

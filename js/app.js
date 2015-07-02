@@ -40,6 +40,9 @@ app.controller('CatsController', ['$scope', 'Data', function($scope, data){
   $scope.color = function(cat){
     return cat.name === $scope.current.name ? 'blue' : 'black'
   }
+  $scope.size = function(cat){
+    return cat.name === $scope.current.name ? '1.4em' : '1em'
+  }
 
 }])
 
@@ -64,6 +67,10 @@ app.controller('GraphicController', ['$scope', function($scope){
     dist = 2 * Math.max(radii[0], radii[1]) / (maxSize * rat)
 
     var centerOffset = .5 * dist
+
+    var mult = Math.max(1, 2 * (radii[0] + radii[1]) / centerOffset)
+    centerOffset *= mult
+    dist *= mult
 
     var ret = {
       'left-radius' : radii[0],

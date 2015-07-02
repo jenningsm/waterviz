@@ -40,7 +40,7 @@ app.directive('graphic', ['$window', function($window){
         circles.push(el[0].children[0].children[i])
       }
 
-      var distance = 5
+      var distance = 50
    
       function distanceSetter(dist){
         distance = dist
@@ -63,12 +63,8 @@ app.directive('graphic', ['$window', function($window){
         'centerOffset' : centerSetter
       }
 
-      var states = {
-        'distance' : distance,
-        'left-radius' : 0,
-        'right-radius' : 0,
-        'centerOffset' : 1
-      }
+      states = scope.scene(0, 0)
+      states.distance = 100
 
       var oldScene = copyObject(states)
 
@@ -119,9 +115,7 @@ app.directive('graphic', ['$window', function($window){
           }
 
           oldScene = copyObject(newScene)
-          console.log(sceneSteps)
           moveCircle.apply(this, sceneSteps)
-          //moveCircle(newScene)
         } 
       }, true)
 

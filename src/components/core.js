@@ -26,11 +26,24 @@ module.exports = function(){
     )
     .content(
       'A comparison of domestic and agricultural water usage in California.'
+    ),
+    el('div').style(
+      sty('width', '80%'),
+      sty('font-size', '1.25em'),
+      sty('margin', '1em auto')
+    )
+    .content(
+      'With the current drought in California, a lot is made of reducing domestic \
+       water consumption, but what about agricultural consumption? How does water \
+       use in the fields compare to water use in the home? See for yourself: Select \
+       a category of domestic water consumption on the left and of agricultural \
+       consumption on the right, and see how much water is used on each across California.'
     )
   )
 
   return el('div').content(
     title,
-    el('water-viz')
+    el('water-viz'),
+    el('div').style(stys.dims('100%', '100px'))
   )
 }
