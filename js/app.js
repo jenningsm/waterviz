@@ -1,5 +1,5 @@
 
-var app = angular.module('app', ['directives']);
+var app = angular.module('app', ['directives', 'graphic']);
 
 app.factory('Data', ['$http', function($http){
 
@@ -52,37 +52,3 @@ app.controller('VizController', ['$scope', function($scope){
 
 }])
 
-app.controller('GraphicController', ['$scope', function($scope){
-
-  var maxSize = .75
-
-  $scope.scene = function(leftValue, rightValue){
-    function areaToRad(area){
-      return Math.sqrt(2 * area)
-    }
-    var radii = [areaToRad(leftValue), areaToRad(rightValue)]
-
-    var rat = Math.min($scope.aspectRatio, 1 / $scope.aspectRatio)
-
-    dist = 2 * Math.max(radii[0], radii[1]) / (maxSize * rat)
-
-    var centerOffset = .5 * dist
-
-    if(centerOffset !== 0){
-      var mult = Math.max(1, 2 * (radii[0] + radii[1]) / centerOffset)
-      centerOffset *= mult
-      dist *= mult
-    }
-
-    var ret = {
-      'left-radius' : radii[0],
-      'right-radius' : radii[1],
-      'distance' : dist,
-      'centerOffset' : centerOffset
-    }
-
-    return ret
-  }
-
-
-}])

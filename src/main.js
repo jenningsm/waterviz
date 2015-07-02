@@ -20,6 +20,7 @@ var scripts = [
   'js/sequence.js',
   'bower_components/angular/angular.js',
   'js/directives.js',
+  'js/graphic.js',
   'js/app.js'
 ]
 
