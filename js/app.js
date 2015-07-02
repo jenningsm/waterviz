@@ -68,9 +68,11 @@ app.controller('GraphicController', ['$scope', function($scope){
 
     var centerOffset = .5 * dist
 
-    var mult = Math.max(1, 2 * (radii[0] + radii[1]) / centerOffset)
-    centerOffset *= mult
-    dist *= mult
+    if(centerOffset !== 0){
+      var mult = Math.max(1, 2 * (radii[0] + radii[1]) / centerOffset)
+      centerOffset *= mult
+      dist *= mult
+    }
 
     var ret = {
       'left-radius' : radii[0],

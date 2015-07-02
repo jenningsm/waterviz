@@ -33,19 +33,6 @@ module.exports = function(width, height, color, num){
     )
   }
 
-/*  return function(x, y, radius){
-    if(radius !== undefined){
-      var circle = el('circle').attribute({
-        'ng-attr-r' : radius,
-        'ng-attr-cx' : x,
-        'ng-attr-cy' : y
-      })
-      svg.content(circle)
-      return circle
-    }
-    return svg
-  }*/
-
   return svg
 }
 
