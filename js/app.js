@@ -51,18 +51,28 @@ app.controller('VizController', ['$scope', function($scope){
 
 app.controller('GraphicController', ['$scope', function($scope){
 
-  function areas(values){
-    function area(value){
-      return Math.sqrt(2 * value)
+  var maxSize = .75
+
+  $scope.scene = function(leftValue, rightValue){
+    function areaToRad(area){
+      return Math.sqrt(2 * area)
     }
-    return {'left' : area(values.left), 'right' : area(values.right)}
+    var radii = [areaToRad(leftValue), areaToRad(rightValue)]
+
+    var rat = Math.min($scope.aspectRatio, 1 / $scope.aspectRatio)
+
+    dist = Math.max(radii[0], radii[1]) / (maxSize * rat)
+
+    var centerOffset = .5 / dist
+
+    var ret = {
+      'radii' : radii,
+      'distance' : dist,
+      'centerOffset' : centerOffset
+    }
+
+    return ret
   }
 
-  function normalize(sizes){
-
-    var rat = .8 * .5 * Math.min($scope.aspectRatio, 1 / $scope.aspectRatio) / Math.max(sizes.left, sizes.right)
-
-    return { 'left' : sizes.left * rat, 'right' : sizes.right * rat}
-  }
 
 }])
