@@ -22,30 +22,19 @@ module.exports = function(){
 
 function whole(){
   return el('div').style(
-    stys.dims('100%', '100%'),
-    stys.flex('row')
+    stys.dims('100%', '100%')
   ).content(
     category('left'),
-    center(),
+    el('graphic', {'leftv' : 'values.left', 'rightv' : 'values.right'})
+    .style(
+      stys.dims('100%', '100%'),
+      sty('position', 'absolute')
+    ),
     category('right')
   )
 }
 
-
 var catWidth = .1
-
-function center(){
-  var box = svgGen(((1 - 2 * catWidth) * 100) + '%', '100%', 'blue') 
-  box().style(
-    sty('height', '100%'),
-    sty('width', ((1) * 100) + '%'),
-    sty('position', 'absolute')
-  )
-
-  box('{{ 33 + &quot;%&quot; }}', '{{ .5 }}', '{{ values.domestic / 100}}')
-  box('{{ 67 + &quot;%&quot; }}', '{{ .5 }}', '{{ values.agricultural / 200 }}')
-  return box()
-}
 
 function category(side){
   return el('categories', {

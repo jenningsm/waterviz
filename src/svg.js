@@ -23,12 +23,12 @@ module.exports = function(width, height, color){
     'fill' : color
   })
 
-  return function(x, y, r){
-    if(x !== undefined){
-      var circle = el('circle/').attribute({
+  return function(x, y, radius){
+    if(radius !== undefined){
+      var circle = el('circle').attribute({
+        'ng-attr-r' : radius,
         'ng-attr-cx' : x,
-        'ng-attr-cy' : y,
-        'ng-attr-r' : r,
+        'ng-attr-cy' : y
       })
       svg.content(circle)
       return circle
