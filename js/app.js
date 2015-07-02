@@ -61,12 +61,13 @@ app.controller('GraphicController', ['$scope', function($scope){
 
     var rat = Math.min($scope.aspectRatio, 1 / $scope.aspectRatio)
 
-    dist = Math.max(radii[0], radii[1]) / (maxSize * rat)
+    dist = 2 * Math.max(radii[0], radii[1]) / (maxSize * rat)
 
-    var centerOffset = .5 / dist
+    var centerOffset = .5 * dist
 
     var ret = {
-      'radii' : radii,
+      'left-radius' : radii[0],
+      'right-radius' : radii[1],
       'distance' : dist,
       'centerOffset' : centerOffset
     }

@@ -2,7 +2,8 @@
   "domestic" : {
     "showers" : 3.1,
     "toilets" : 1.1,
-    "lawns" : 10.4
+    "lawns" : 10.4,
+    "fields" : 30
   },
   "agricultural" : {
     "total" : 100.4,

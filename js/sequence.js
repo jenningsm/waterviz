@@ -21,11 +21,12 @@ function sequence(setters, initialStates){
 
     queuedMotions = []
 
-    function motion(from, to){
+    function motion(from, to, time){
       return parallelMoves(
         setters,
         from,
         to,
+        time,
         function(){
           states = to
           queuedMotions.shift()
@@ -36,11 +37,11 @@ function sequence(setters, initialStates){
     }
 
     for(var i = 0; i < arguments.length; i++){
-      var target = arguments[i]
       queuedMotions.push(
         motion(
           i === 0 ? states : copyObject(arguments[i-1]),
-          copyObject(arguments[i])
+          copyObject(arguments[i]),
+          arguments[i].time
         )
       )
     }
@@ -51,7 +52,7 @@ function sequence(setters, initialStates){
   
 }
 
-function parallelMoves(setters, start, stop, next){
+function parallelMoves(setters, start, stop, time, next){
   var runners = {}
   var numRunners = 0
   var numReturned = 0
@@ -63,15 +64,14 @@ function parallelMoves(setters, start, stop, next){
   }
 
   Object.keys(setters).forEach(function(key){
-    if(start[key] !== stop[key]){
-      numRunners++
+    numRunners++
 
-      runners[key] = new MoveGen(setters[key], 2)
-      .ends(start[key], stop[key])
-      .acceleration(1, 1)
-      .callback(done)
-    }
+    runners[key] = new MoveGen(setters[key], time)
+    .ends(start[key], stop[key])
+    .acceleration(1, 1)
+    .callback(done)
   }) 
+
 
   function run(){
     Object.keys(runners).forEach(function(key){
@@ -100,10 +100,10 @@ function parallelMoves(setters, start, stop, next){
 }
 
 
-function copyObject(states){
+function copyObject(o){
   var ret = {}
-  Object.keys(states).forEach(function(key){
-    ret[key] = states[key]
+  Object.keys(o).forEach(function(key){
+    ret[key] = o[key]
   })
   return ret
 }

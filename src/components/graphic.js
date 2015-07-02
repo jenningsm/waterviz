@@ -6,13 +6,10 @@ var sty = stys.style
 var svgGen = require('../svg.js')
 
 module.exports = function(){
-  var box = svgGen('100%', '100%', 'blue') 
-  box().style(
+  var box = svgGen('100%', '100%', 'blue', 2) 
+  box.style(
     sty('position', 'absolute')
   )
 
-  box('{{.33 }}', '{{ .5 }}','{{ leftSize }}')
-  box('{{.67 }}', '{{ .5 }}', '{{ rightSize  }}')
-
-  return box()
+  return box
 }

@@ -9,7 +9,7 @@ var el = require("./utils/el.js")
     color: the color of the lines within the element
 
 */
-module.exports = function(width, height, color){
+module.exports = function(width, height, color, num){
 
   var svg = el('svg').attribute({
     'viewBox' : '0 0 1 1',
@@ -23,7 +23,17 @@ module.exports = function(width, height, color){
     'fill' : color
   })
 
-  return function(x, y, radius){
+  for(var i = 0; i < num; i++){
+    svg.content(
+      el('circle', {
+        'r' : 0,
+        'cx' : .5,
+        'cy' : .5
+      })
+    )
+  }
+
+/*  return function(x, y, radius){
     if(radius !== undefined){
       var circle = el('circle').attribute({
         'ng-attr-r' : radius,
@@ -34,7 +44,9 @@ module.exports = function(width, height, color){
       return circle
     }
     return svg
-  }
+  }*/
+
+  return svg
 }
 
 //truncated a number down to precision number of digits
