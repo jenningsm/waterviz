@@ -16,7 +16,7 @@ module.exports = function(stylesheets, fonts){
   })
 
   head.content(
-    el('title').content('title here'),
+    el('title').content('Water'),
     el("meta/", {
       'name' : 'viewport',
       'content' : 'width=device-width, initial-scale=1.0'

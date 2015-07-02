@@ -42,7 +42,7 @@ function category(side){
   }).style(
     sty('margin', '.7em'),
     sty('height', '100%'),
-    sty('width', (100 * catWidth) + "%"),
+//    sty('width', (100 * catWidth) + "%"),
     sty('font-size', '1.3em'),
     stys.flex('column', 'flex-start', 'flex-' + (side === 'left' ? 'start' : 'end')),
     sty('position', 'absolute'),
