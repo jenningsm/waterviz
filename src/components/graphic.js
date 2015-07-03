@@ -11,5 +11,28 @@ module.exports = function(){
     sty('position', 'absolute')
   )
 
-  return box
+  function textBox(){
+    return el('div').style(
+      sty('position', 'absolute')
+    ).content(
+      el('span').style(
+        sty('transform', 'translate(-50%, -50%)'),
+        sty('position', 'absolute'),
+        sty('color', 'white'),
+        sty('font-size', '1.3em')
+      )
+      .content('text')
+   )
+
+  }
+
+  var text = el('div').style(
+    stys.dims('100%', '100%'),
+    sty('position', 'absolute')
+  ).content(
+    textBox(),
+    textBox()
+  )
+
+  return el().content(box, text)
 }

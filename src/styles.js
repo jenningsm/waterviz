@@ -1,4 +1,15 @@
 
+module.exports.merge = function(){
+  var ret = {}
+  for(var i = 0; i < arguments.length; i++){
+    var o = arguments[i]
+    Object.keys(o).forEach(function(key){
+      ret[key] = o[key]
+    })
+  }
+  return ret
+}
+
 module.exports.font = function(font, size){
 
   var ret = {}

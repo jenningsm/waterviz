@@ -73,8 +73,13 @@ app.directive('graphic', ['$window', function($window){
 
       var sides = ['left', 'right']
       var circles = []
+      var texts = []
       for(var i = 0; i < sides.length; i++){
         circles.push(el[0].children[0].children[i])
+        texts.push(el[0].children[1].children[i])
+        console.log(el[0].children[1].children[i])
+        texts[i].style.top = '50%'
+        texts[i].style.transform = "translate(" + ((.5 + .25 * (i === 0 ? -1 : 1)) * 100) + '%, 0)'
       }
 
       var distance = 50
@@ -89,7 +94,9 @@ app.directive('graphic', ['$window', function($window){
       }
       function centerSetter(centerOffset){
         for(var i = 0; i < 2; i++){
-          circles[i].setAttribute('cx', .5 + (i === 0 ? -1 : 1) * centerOffset / distance)
+          var pos = .5 + (i === 0 ? -1 : 1) * centerOffset / distance
+          circles[i].setAttribute('cx', pos)
+          texts[i].style.left = (100 * pos) + '%'
         }
       }
 
@@ -102,6 +109,7 @@ app.directive('graphic', ['$window', function($window){
 
       states = getScene(0, 0)
       states.distance = 100
+      states.centerOffset = (1 / 6) * states.distance
 
       var oldScene = copyObject(states)
 
