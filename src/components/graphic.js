@@ -13,13 +13,14 @@ module.exports = function(){
 
   function textBox(){
     return el('div').style(
-      sty('position', 'absolute')
+      sty('position', 'absolute'),
+      sty('color', 'white')
     ).content(
       el('span').style(
         sty('transform', 'translate(-50%, -50%)'),
         sty('position', 'absolute'),
-        sty('color', 'white'),
-        sty('font-size', '1.3em')
+        sty('font-size', '1.3em'),
+        sty('width', 'max-content')
       )
       .content('text')
    )

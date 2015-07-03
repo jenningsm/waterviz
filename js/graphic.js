@@ -73,13 +73,19 @@ app.directive('graphic', ['$window', function($window){
 
       var sides = ['left', 'right']
       var circles = []
-      var texts = []
+      var textBoxes = []
+      var circleValues = []
       for(var i = 0; i < sides.length; i++){
         circles.push(el[0].children[0].children[i])
-        texts.push(el[0].children[1].children[i])
-        console.log(el[0].children[1].children[i])
-        texts[i].style.top = '50%'
-        texts[i].style.transform = "translate(" + ((.5 + .25 * (i === 0 ? -1 : 1)) * 100) + '%, 0)'
+        textBoxes.push(el[0].children[1].children[i])
+        textBoxes[i].style.top = '50%'
+        textBoxes[i].style.transform = "translate(" + ((.5 + .25 * (i === 0 ? -1 : 1)) * 100) + '%, 0)'
+        circleValues[i] = 0
+      }
+
+      function roundValue(value){
+        var precision = 10
+        return Math.round(value / precision) * precision
       }
 
       var distance = 50
@@ -90,13 +96,26 @@ app.directive('graphic', ['$window', function($window){
       function radiusSetter(index){
         return function(radius){
           circles[index].setAttribute('r', radius / distance)
+          var newValue = roundValue(.5 * Math.PI * radius * radius)
+          if(circleValues[index] !== newValue){
+            textBoxes[index].children[0].innerHTML = newValue + ' gallons'
+
+            circleValues[index] = newValue
+          }
+          if(radius / distance < .03){
+            textBoxes[index].style.top = ((.535 + Math.max(1, scope.aspectRatio) * radius / distance) * 100) + '%'
+            textBoxes[index].style.color = 'black'
+          } else {
+            textBoxes[index].style.top = '50%'
+            textBoxes[index].style.color = 'white'
+          }
         }
       }
       function centerSetter(centerOffset){
         for(var i = 0; i < 2; i++){
           var pos = .5 + (i === 0 ? -1 : 1) * centerOffset / distance
           circles[i].setAttribute('cx', pos)
-          texts[i].style.left = (100 * pos) + '%'
+          textBoxes[i].style.left = (100 * pos) + '%'
         }
       }
 
