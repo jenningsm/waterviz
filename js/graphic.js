@@ -12,14 +12,17 @@ app.directive('graphic', ['$window', function($window){
 
 function link($window){
   return function(scope, el){
-  
-    function getAspectRatio(){
-      scope.aspectRatio =  el[0].offsetWidth / el[0].offsetHeight
+
+    var dims, aspectRatio  
+
+    function getDims(){
+      dims = [el[0].offsetWidth, el[0].offsetHeight]
+      aspectRatio =  dims[0] / dims[1]
     }
   
     var win = angular.element($window);
-    win.bind("resize", getAspectRatio)
-    getAspectRatio()
+    win.bind("resize", getDims)
+    getDims()
   
 
     /* --------------------------------- */
@@ -35,7 +38,7 @@ function link($window){
       circles.push(el[0].children[0].children[i])
       textBoxes.push(el[0].children[1].children[i])
       textBoxes[i].style.top = '50%'
-      textBoxes[i].style.transform = "translate(" + ((.5 + .25 * (i === 0 ? -1 : 1)) * 100) + '%, 0)'
+      textBoxes[i].style.left = ((.5 + .25 * (i === 0 ? -1 : 1)) * 100) + '%'
       circleValues[i] = 0
     }
   
@@ -55,12 +58,12 @@ function link($window){
   
     var setters = {
       'distance' : distanceSetter,
-      'left-radius' : radiusSetter(0, distance, scope.aspectRatio, circles, textBoxes, circleValues),
-      'right-radius' : radiusSetter(1, distance, scope.aspectRatio, circles, textBoxes, circleValues),
+      'left-radius' : radiusSetter(distance, dims, circles[0], textBoxes[0]),
+      'right-radius' : radiusSetter(distance, dims, circles[1], textBoxes[1]),
       'centerOffset' : centerSetter
     }
   
-    states = getScene(0, 0, scope.aspectRatio, 0)
+    states = getScene(0, 0, aspectRatio, 0)
     states.distance = 100
     states.centerOffset = (1 / 6) * states.distance
   
@@ -71,7 +74,7 @@ function link($window){
       if(newv.right === undefined || newv.left === undefined)
         return
 
-      var newScene = getScene(newv.left, newv.right, scope.aspectRatio, oldScene.distance)
+      var newScene = getScene(newv.left, newv.right, aspectRatio, oldScene.distance)
       var sceneSteps = getSteps(oldScene, newScene)
       oldScene = newScene
 
@@ -82,8 +85,22 @@ function link($window){
   }
 }
 
+function changeDetector(initialValue, action, transform){
+  if(transform === undefined)
+    transform = function(x) { return x }
 
-function radiusSetter(index, distance, aspectRatio, circles, textBoxes, circleValues){
+  var value = transform(initialValue)
+  action(value)
+
+  return function(newValue){
+    if(transform(newValue) !== value){
+      value = transform(newValue)
+      action(value)
+    }
+  }
+}
+
+function radiusSetter(distance, dims, circle, textBox){
 
   function roundValue(value){
     var rounded = 0
@@ -97,20 +114,28 @@ function radiusSetter(index, distance, aspectRatio, circles, textBoxes, circleVa
     return rounded
   }
 
-  return function(radius){
-    circles[index].setAttribute('r', radius / distance[0])
-    var newValue = roundValue(.5 * Math.PI * radius * radius)
-    if(circleValues[index] !== newValue){
-      textBoxes[index].children[0].innerHTML = newValue + ' gallons'
-  
-      circleValues[index] = newValue
+  var gallonDisplay = changeDetector(0, 
+    function(gallons){
+      textBox.children[0].innerHTML = gallons + ' gallons'
+    },
+    function(radius){
+      return roundValue(.5 * Math.PI * radius * radius)
     }
+  )
+
+  var aspectRatio = dims[0] / dims[1]
+
+  return function(radius){
+    circle.setAttribute('r', radius / distance[0])
+
+    gallonDisplay(radius)
+
     if(radius / distance[0] < .03){
-      textBoxes[index].style.top = ((.535 + Math.max(1, aspectRatio) * radius / distance[0]) * 100) + '%'
-      textBoxes[index].style.color = 'black'
+      textBox.style.top = ((.535 + Math.max(1, aspectRatio) * radius / distance[0]) * 100) + '%'
+      textBox.style.color = 'black'
     } else {
-      textBoxes[index].style.top = '50%'
-      textBoxes[index].style.color = 'white'
+      textBox.style.top = '50%'
+      textBox.style.color = 'white'
     }
   }
 }
