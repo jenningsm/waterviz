@@ -7,7 +7,7 @@ module.exports = function(pages, cssName){
     elements.push(pages[key])
   })
   
-  var p = Element.generate(elements, [{}],true);
+  var p = Element.generate(elements, [{}], false);
   
   if(cssName === undefined)
     cssName = 'o.css'

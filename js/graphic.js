@@ -50,13 +50,19 @@ function link($window){
     function distanceSetter(dist){
       distance[0] = dist
     }
-    function centerSetter(centerOffset){
-      for(var i = 0; i < 2; i++){
-        var pos = .5 + (i === 0 ? -1 : 1) * centerOffset / distance[0]
-        circles[i].setAttribute('cx', pos)
-        textBoxes[i].style.left = (100 * pos) + '%'
+
+    var centerSetter = changeDetector( 
+      function(apparentCenterOffset){
+        for(var i = 0; i < 2; i++){
+          var pos = .5 + (i === 0 ? -1 : 1) * apparentCenterOffset
+          circles[i].setAttribute('cx', pos)
+          textBoxes[i].style.left = (100 * pos) + '%'
+        }
+      },
+      function(centerOffset){
+        return centerOffset / distance[0]
       }
-    }
+    )
   
     var setters = {
       'distance' : distanceSetter,
@@ -87,6 +93,30 @@ function link($window){
   }
 }
 
+/*
+  action and transform are both supposed to be functions
+
+  Returns a function that's meant to take a series of
+  inputs. That function will call action each time one
+  of those inputs is different than the last one passed in.
+  Additionally, if the transform argument is specified, then
+  each input will be passed through transform before it is
+  tested for equality and before it is passed to action (if at all).
+*/
+function changeDetector(action, transform){
+  if(transform === undefined)
+    transform = function(x) { return x }
+
+  var value
+
+  return function(newValue){
+    if(transform(newValue) !== value){
+      value = transform(newValue)
+      action(value)
+    }
+  }
+}
+
 function translate(element, x, y){
   var transform = 'translate(' + x + ',' + y + ')'
   element.style.transform = transform
@@ -95,20 +125,6 @@ function translate(element, x, y){
 
 function radiusSetter(distance, dims, circle, textBox){
 
-  function changeDetector(initialValue, action, transform){
-    if(transform === undefined)
-      transform = function(x) { return x }
-  
-    var value = transform(initialValue)
-    action(value)
-  
-    return function(newValue){
-      if(transform(newValue) !== value){
-        value = transform(newValue)
-        action(value)
-      }
-    }
-  }
 
   function roundValue(value){
     var rounded = 0
@@ -124,7 +140,7 @@ function radiusSetter(distance, dims, circle, textBox){
 
   var textLength
 
-  var textTracker = changeDetector(0,
+  var textTracker = changeDetector(
     function(){
       textLength = textBox.children[0].clientWidth
     },
@@ -136,7 +152,7 @@ function radiusSetter(distance, dims, circle, textBox){
     }
   )
 
-  var gallonDisplay = changeDetector(0, 
+  var gallonDisplay = changeDetector(
     function(gallons){
       textBox.children[0].innerHTML = gallons + ' gallons'
       textTracker(gallons)
@@ -145,6 +161,7 @@ function radiusSetter(distance, dims, circle, textBox){
       return roundValue(.5 * Math.PI * radius * radius)
     }
   )
+  gallonDisplay(0)
 
 
   return function(radius){
@@ -156,7 +173,7 @@ function radiusSetter(distance, dims, circle, textBox){
     var circleDiameter = 2 * dims[0] * radius / distance[0]
     var aspectRatio = dims[0] / dims[1]
 
-    if(circleDiameter < textLength){
+    if(circleDiameter < textLength + 4){
       textBox.style.top = ((.505 + Math.max(1, aspectRatio) * radius / distance[0]) * 100) + '%'
       translate(textBox, 0, '50%')
       textBox.style.color = 'black'
@@ -174,16 +191,16 @@ function getSteps(oldScene, newScene){
   function timeFunction(constant){
     return function(oldv, newv){
       return Math.min(
-        Math.sqrt(Math.abs(oldv-newv)) * constant,
+        Math.pow(Math.abs(oldv-newv), .4) * constant,
         2
       )
     }
   }
 
   var timeFunctions = [
-    timeFunction(1/15),
-    timeFunction(1/6),
-    timeFunction(.3)
+    timeFunction(.1),
+    timeFunction(.18),
+    timeFunction(.35)
   ]
   if(newScene.distance < oldScene.distance){
     steps.reverse()
