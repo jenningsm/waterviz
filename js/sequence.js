@@ -1,11 +1,9 @@
 
-function sequence(setters, initialStates){
+function sequence(setter, initialStates){
   
   var states = initialStates
 
-  Object.keys(setters).forEach(function(key){
-    setters[key](states[key])
-  })
+  setter(states)
 
   var queuedMotions = []
 
@@ -23,7 +21,7 @@ function sequence(setters, initialStates){
 
     function motion(from, to, time){
       return parallelMoves(
-        setters,
+        setter,
         from,
         to,
         time,
@@ -52,19 +50,21 @@ function sequence(setters, initialStates){
   
 }
 
-function parallelMoves(setters, start, stop, time, next){
+function parallelMoves(setter, starts, stops, time, next){
 
-  function specificPos(pos, setter){
-    return start[setter] + pos * (stop[setter] - start[setter])
+  function specificPos(pos, key){
+    return starts[key] + pos * (stops[key] - starts[key])
   }
 
-  function setter(x){
-    Object.keys(setters).forEach(function(key){
-      setters[key](specificPos(x, key))
+  function aggregateSetter(x){
+    var positions = {}
+    Object.keys(starts).forEach(function(key){
+      positions[key] = specificPos(x, key)
     })
+    setter(positions)
   }
 
-  var runner = new MoveGen(setter, time)
+  var runner = new MoveGen(aggregateSetter, time)
   .acceleration(1, 1)
   .callback(next)
 

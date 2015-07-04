@@ -44,13 +44,6 @@ function link($window){
       circleValues[i] = 0
     }
   
-    //made as an array so it can be passed by reference
-    var distance = [50]
-     
-    function distanceSetter(dist){
-      distance[0] = dist
-    }
-
     var centerSetter = changeDetector( 
       function(apparentCenterOffset){
         for(var i = 0; i < 2; i++){
@@ -59,16 +52,20 @@ function link($window){
           textBoxes[i].style.left = (100 * pos) + '%'
         }
       },
-      function(centerOffset){
-        return centerOffset / distance[0]
+      function(centerOffset, distance){
+        return centerOffset / distance
       }
     )
   
-    var setters = {
-      'distance' : distanceSetter,
-      'left-radius' : radiusSetter(distance, dims, circles[0], textBoxes[0]),
-      'right-radius' : radiusSetter(distance, dims, circles[1], textBoxes[1]),
-      'centerOffset' : centerSetter
+    var radiiSetters = [
+      radiusSetter(dims, circles[0], textBoxes[0]),
+      radiusSetter(dims, circles[1], textBoxes[1])
+    ]
+
+    var setter = function(positions){
+      radiiSetters[0](positions['left-radius'], positions.distance)
+      radiiSetters[1](positions['right-radius'], positions.distance)
+      centerSetter(positions.centerOffset, positions.distance)
     }
   
     states = getScene(0, 0, aspectRatio, 0)
@@ -76,7 +73,7 @@ function link($window){
     states.centerOffset = (1 / 6) * states.distance
   
     var oldScene = states
-    var moveCircles = sequence(setters, states)
+    var moveCircles = sequence(setter, states)
  
     function valueChange(newv){ 
       if(newv.right === undefined || newv.left === undefined)
@@ -109,10 +106,13 @@ function changeDetector(action, transform){
 
   var value
 
-  return function(newValue){
-    if(transform(newValue) !== value){
-      value = transform(newValue)
-      action(value, newValue)
+  return function(){
+    var args = Array.prototype.slice.call(arguments)
+
+    var newTransformed = transform.apply(this, args)
+    if(newTransformed !== value){
+      value = newTransformed
+      action.apply(this, [value].concat(args))
     }
   }
 }
@@ -123,7 +123,7 @@ function translate(element, x, y){
   element.style.webkitTransform = transform
 }
 
-function radiusSetter(distance, dims, circle, textBox){
+function radiusSetter(dims, circle, textBox){
 
 
   function roundValue(value){
@@ -163,11 +163,9 @@ function radiusSetter(distance, dims, circle, textBox){
   )
   gallonDisplay(0)
 
-  var inOrOut = changeDetector(
-    function(stat, radius){
+  var textStatus = changeDetector(
+    function(stat){
       if(stat === 'out'){
-        var aspectRatio = dims[0] / dims[1]
-        textBox.style.top = ((.5 + Math.max(1, aspectRatio) * radius / distance[0]) * 100) + '%'
         translate(textBox, 0, '50%')
         textBox.style.color = 'black'
       } else {
@@ -176,23 +174,46 @@ function radiusSetter(distance, dims, circle, textBox){
         textBox.style.color = 'white'
       }
     },
-    function(radius){
-      var circleDiameter = 2 * dims[0] * radius / distance[0]
-
-      if(circleDiameter < textLength + 4){
+    function(stat){
+      if(typeof stat === 'number'){
         return 'out'
       } else {
         return 'in'
       }
     }
   )
-  inOrOut(0)
 
-  return function(radius){
-    circle.setAttribute('r', radius / distance[0])
+  var textPositionChange = changeDetector(
+    function(stat){
+      //if the text is inside the circle, sets its top position to match the apparent radius
+      if(typeof stat === 'number'){
+        var aspectRatio = dims[0] / dims[1]
+        textBox.style.top = ((.5 + Math.max(1, aspectRatio) * stat) * 100) + '%'
+      }
+      //update the in-or-out status of the text
+      textStatus(stat)
+    },
+    function(radius, distance){
+      var circleDiameter = 2 * dims[0] * radius / distance
+
+      //if the text is too large to fit in the circle, it will need to go outside the circle
+      //if it is outside the circle, we will need to change its position everytime the radius changes
+      //if it is inside the circle, its positions will remain static, so we only need to make
+      //a change when it goes from outside the circle to inside
+      if(circleDiameter < textLength + 4){
+        //return the apparent radius
+        return radius / distance
+      } else {
+        return 'in'
+      }
+    }
+  )
+
+  return function(radius, distance){
+    circle.setAttribute('r', radius / distance)
 
     gallonDisplay(radius)
-    inOrOut(radius)
+    textPositionChange(radius, distance)
   }
 }
 
