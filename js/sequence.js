@@ -53,43 +53,33 @@ function sequence(setters, initialStates){
 }
 
 function parallelMoves(setters, start, stop, time, next){
-  var runners = {}
-  var numRunners = 0
-  var numReturned = 0
 
-  function done(){
-    numReturned++
-    if(numReturned === numRunners)
-      next()
+  function specificPos(pos, setter){
+    return start[setter] + pos * (stop[setter] - start[setter])
   }
 
-  Object.keys(setters).forEach(function(key){
-    numRunners++
+  function setter(x){
+    Object.keys(setters).forEach(function(key){
+      setters[key](specificPos(x, key))
+    })
+  }
 
-    runners[key] = new MoveGen(setters[key], time)
-    .ends(start[key], stop[key])
-    .acceleration(1, 1)
-    .callback(done)
-  }) 
+  var runner = new MoveGen(setter, time)
+  .acceleration(1, 1)
+  .callback(next)
 
 
   function run(){
-    Object.keys(runners).forEach(function(key){
-      runners[key].run()
-    })
+    runner.run()
   }
 
   function interrupt(){
-    var ret = {}
-    Object.keys(runners).forEach(function(key){
-      ret[key] = runners[key].interrupt()
-    })
+    var states = {}
+    var pos = runner.interrupt()
     Object.keys(setters).forEach(function(key){
-      //if ret[key] is undefined, the start and stop are equal
-      if(ret[key] === undefined)
-        ret[key] = start[key]
+      states[key] = specificPos(pos, key)
     })
-    return ret
+    return states
   }
 
   return {
