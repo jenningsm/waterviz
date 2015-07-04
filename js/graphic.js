@@ -13,10 +13,12 @@ app.directive('graphic', ['$window', function($window){
 function link($window){
   return function(scope, el){
 
-    var dims, aspectRatio  
+    var dims = []
+    var aspectRatio  
 
     function getDims(){
-      dims = [el[0].offsetWidth, el[0].offsetHeight]
+      dims[0] = el[0].offsetWidth
+      dims[1] = el[0].offsetHeight
       aspectRatio =  dims[0] / dims[1]
     }
   
@@ -85,22 +87,28 @@ function link($window){
   }
 }
 
-function changeDetector(initialValue, action, transform){
-  if(transform === undefined)
-    transform = function(x) { return x }
-
-  var value = transform(initialValue)
-  action(value)
-
-  return function(newValue){
-    if(transform(newValue) !== value){
-      value = transform(newValue)
-      action(value)
-    }
-  }
+function translate(element, x, y){
+  var transform = 'translate(' + x + ',' + y + ')'
+  element.style.transform = transform
+  element.style.webkitTransform = transform
 }
 
 function radiusSetter(distance, dims, circle, textBox){
+
+  function changeDetector(initialValue, action, transform){
+    if(transform === undefined)
+      transform = function(x) { return x }
+  
+    var value = transform(initialValue)
+    action(value)
+  
+    return function(newValue){
+      if(transform(newValue) !== value){
+        value = transform(newValue)
+        action(value)
+      }
+    }
+  }
 
   function roundValue(value){
     var rounded = 0
@@ -114,26 +122,46 @@ function radiusSetter(distance, dims, circle, textBox){
     return rounded
   }
 
+  var textLength
+
+  var textTracker = changeDetector(0,
+    function(){
+      textLength = textBox.children[0].clientWidth
+    },
+    function(gallons){
+      if(gallons < 1)
+        return 1
+
+      return 1 + Math.floor(Math.log(gallons) / Math.LN10)
+    }
+  )
+
   var gallonDisplay = changeDetector(0, 
     function(gallons){
       textBox.children[0].innerHTML = gallons + ' gallons'
+      textTracker(gallons)
     },
     function(radius){
       return roundValue(.5 * Math.PI * radius * radius)
     }
   )
 
-  var aspectRatio = dims[0] / dims[1]
 
   return function(radius){
+
     circle.setAttribute('r', radius / distance[0])
 
     gallonDisplay(radius)
+    
+    var circleDiameter = 2 * dims[0] * radius / distance[0]
+    var aspectRatio = dims[0] / dims[1]
 
-    if(radius / distance[0] < .03){
-      textBox.style.top = ((.535 + Math.max(1, aspectRatio) * radius / distance[0]) * 100) + '%'
+    if(circleDiameter < textLength){
+      textBox.style.top = ((.505 + Math.max(1, aspectRatio) * radius / distance[0]) * 100) + '%'
+      translate(textBox, 0, '50%')
       textBox.style.color = 'black'
     } else {
+      translate(textBox, 0, 0)
       textBox.style.top = '50%'
       textBox.style.color = 'white'
     }

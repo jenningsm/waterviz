@@ -16,9 +16,8 @@ module.exports = function(){
       sty('position', 'absolute'),
       sty('color', 'white')
     ).content(
-      el('span').style(
+      el('div').style(
         sty('transform', 'translate(-50%, -50%)'),
-        sty('position', 'absolute'),
         sty('font-size', '1.3em'),
         sty('width', 'max-content')
       )
