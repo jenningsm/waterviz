@@ -47,9 +47,9 @@ function link($window){
     var centerSetter = changeDetector( 
       function(apparentCenterOffset){
         for(var i = 0; i < 2; i++){
-          var pos = .5 + (i === 0 ? -1 : 1) * apparentCenterOffset
-          circles[i].setAttribute('cx', pos)
-          textBoxes[i].style.left = (100 * pos) + '%'
+          var pos = (i === 0 ? -1 : 1) * apparentCenterOffset
+          circles[i].setAttribute('cx', .5 + pos)
+          textBoxes[i].style.left = (50 + 100 * pos * Math.max(1, dims[1] / dims[0])) + '%'
         }
       },
       function(centerOffset, distance){
