@@ -209,7 +209,7 @@ function getSteps(oldScene, newScene){
   }
 
   var timeFunctions = [
-    timeFunction(.1),
+    timeFunction(.13),
     timeFunction(.18),
     timeFunction(.35)
   ]
