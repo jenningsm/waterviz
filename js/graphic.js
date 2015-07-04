@@ -10,6 +10,13 @@ app.directive('graphic', ['$window', function($window){
   }
 }])
 
+function realWidth(svgWidth, aspectRatio){
+  return Math.max(1, 1 / aspectRatio) * svgWidth
+}
+function realHeight(svgHeight, aspectRatio){
+  return Math.max(1, aspectRatio) * svgHeight
+}
+
 function link($window){
   return function(scope, el){
 
@@ -49,7 +56,7 @@ function link($window){
         for(var i = 0; i < 2; i++){
           var pos = (i === 0 ? -1 : 1) * apparentCenterOffset
           circles[i].setAttribute('cx', .5 + pos)
-          textBoxes[i].style.left = (50 + 100 * pos * Math.max(1, dims[1] / dims[0])) + '%'
+          textBoxes[i].style.left = (50 + 100 * realWidth(pos, aspectRatio)) + '%'
         }
       },
       function(centerOffset, distance){
@@ -188,7 +195,7 @@ function radiusSetter(dims, circle, textBox){
       //if the text is inside the circle, sets its top position to match the apparent radius
       if(typeof stat === 'number'){
         var aspectRatio = dims[0] / dims[1]
-        textBox.style.top = ((.5 + Math.max(1, aspectRatio) * stat) * 100) + '%'
+        textBox.style.top = ((.5 + realHeight(stat, aspectRatio)) * 100) + '%'
       }
       //update the in-or-out status of the text
       textStatus(stat)
