@@ -112,7 +112,7 @@ function changeDetector(action, transform){
   return function(newValue){
     if(transform(newValue) !== value){
       value = transform(newValue)
-      action(value)
+      action(value, newValue)
     }
   }
 }
@@ -163,25 +163,36 @@ function radiusSetter(distance, dims, circle, textBox){
   )
   gallonDisplay(0)
 
+  var inOrOut = changeDetector(
+    function(stat, radius){
+      if(stat === 'out'){
+        var aspectRatio = dims[0] / dims[1]
+        textBox.style.top = ((.5 + Math.max(1, aspectRatio) * radius / distance[0]) * 100) + '%'
+        translate(textBox, 0, '50%')
+        textBox.style.color = 'black'
+      } else {
+        translate(textBox, 0, 0)
+        textBox.style.top = '50%'
+        textBox.style.color = 'white'
+      }
+    },
+    function(radius){
+      var circleDiameter = 2 * dims[0] * radius / distance[0]
+
+      if(circleDiameter < textLength + 4){
+        return 'out'
+      } else {
+        return 'in'
+      }
+    }
+  )
+  inOrOut(0)
 
   return function(radius){
-
     circle.setAttribute('r', radius / distance[0])
 
     gallonDisplay(radius)
-    
-    var circleDiameter = 2 * dims[0] * radius / distance[0]
-    var aspectRatio = dims[0] / dims[1]
-
-    if(circleDiameter < textLength + 4){
-      textBox.style.top = ((.505 + Math.max(1, aspectRatio) * radius / distance[0]) * 100) + '%'
-      translate(textBox, 0, '50%')
-      textBox.style.color = 'black'
-    } else {
-      translate(textBox, 0, 0)
-      textBox.style.top = '50%'
-      textBox.style.color = 'white'
-    }
+    inOrOut(radius)
   }
 }
 
