@@ -20,13 +20,20 @@ function realHeight(svgHeight, aspectRatio){
 function link($window){
   return function(scope, el){
 
-    var dims = []
+    var model = {
+      'centerOffset' : new Tracker(0),
+      'distance' : new Tracker(100),
+      'left-radius' : new Tracker(0),
+      'right-radius' : new Tracker(0),
+      'dims' : new Tracker()
+    }
+
     var aspectRatio  
 
     function getDims(){
-      dims[0] = el[0].offsetWidth
-      dims[1] = el[0].offsetHeight
+      var dims = [el[0].offsetWidth, el[0].offsetHeight]
       aspectRatio =  dims[0] / dims[1]
+      model['dims'].update(dims)
     }
   
     var win = angular.element($window);
@@ -45,29 +52,28 @@ function link($window){
       circles.push(el[0].children[0].children[i])
       textBoxes.push(el[0].children[1].children[i])
     }
-  
-    var centerSetter = changeDetector( 
-      function(apparentCenterOffset){
+ 
+    /* TODO: this needs to update on dims change */ 
+    updater(
+      subset(model, 'centerOffset', 'distance', 'dims'),
+      function(states){
+        return states.centerOffset / states.distance
+      },
+      function(apparentCenterOffset, states){
+        var dims = states.dims
         for(var i = 0; i < 2; i++){
           var pos = (i === 0 ? -1 : 1) * apparentCenterOffset
           circles[i].setAttribute('cx', .5 + pos)
-          textBoxes[i].style.left = (50 + 100 * realWidth(pos, aspectRatio)) + '%'
+          textBoxes[i].style.left = (50 + 100 * realWidth(pos, dims[0] / dims[1])) + '%'
         }
-      },
-      function(centerOffset, distance){
-        return centerOffset / distance
       }
     )
-  
-    var radiiSetters = [
-      radiusSetter(dims, circles[0], textBoxes[0]),
-      radiusSetter(dims, circles[1], textBoxes[1])
-    ]
+
+    radiusSetter(model['left-radius'], model['distance'], model['dims'], circles[0], textBoxes[0]),
+    radiusSetter(model['right-radius'], model['distance'], model['dims'], circles[1], textBoxes[1])
 
     var setter = function(positions){
-      radiiSetters[0](positions['left-radius'], positions.distance)
-      radiiSetters[1](positions['right-radius'], positions.distance)
-      centerSetter(positions.centerOffset, positions.distance)
+      update(model, positions)
     }
   
     states = getScene(0, 0, aspectRatio, 0)
@@ -125,8 +131,16 @@ function translate(element, x, y){
   element.style.webkitTransform = transform
 }
 
-function radiusSetter(dims, circle, textBox){
+function radiusSetter(radiusTracker, distanceTracker, dimTracker, circle, textBox){
 
+  var model = {
+    'radius' : radiusTracker,
+    'gallons' : new Tracker(0),
+    'textStatus' : new Tracker('out'),
+    'distance' : distanceTracker,
+    'dims' : dimTracker,
+    'textLength' : new Tracker(0)
+  }
 
   function roundValue(value){
     var rounded = 0
@@ -140,32 +154,42 @@ function radiusSetter(dims, circle, textBox){
     return rounded
   }
 
-  var textLength
-
-  var textTracker = changeDetector(
-    function(){
-      textLength = textBox.children[0].clientWidth
-    },
-    function(gallons){
+  updater(
+    subset(model, 'gallons'),
+    function(states){
+      var gallons = states.gallons
       if(gallons < 1)
         return 1
 
       return 1 + Math.floor(Math.log(gallons) / Math.LN10)
+    },
+    function(){
+      model.textLength.update(textBox.children[0].clientWidth)
     }
   )
 
-  var gallonDisplay = changeDetector(
+  updater(
+    subset(model, 'radius'),
+    function(states){
+      var radius = states.radius
+      return roundValue(.5 * Math.PI * radius * radius)
+    },
     function(gallons){
       textBox.children[0].innerHTML = gallons + ' gallons'
-      textTracker(gallons)
-    },
-    function(radius){
-      return roundValue(.5 * Math.PI * radius * radius)
+      model.gallons.update(gallons)
     }
   )
-  gallonDisplay(0)
 
-  var textStatus = changeDetector(
+  updater(
+    subset(model, 'textStatus'),
+    function(states){
+      var stat = states.textStatus
+      if(typeof stat === 'number'){
+        return 'out'
+      } else {
+        return 'in'
+      }
+    },
     function(stat){
       if(stat === 'out'){
         translate(textBox, 0, '50%')
@@ -175,47 +199,50 @@ function radiusSetter(dims, circle, textBox){
         textBox.style.top = '50%'
         textBox.style.color = 'white'
       }
-    },
-    function(stat){
-      if(typeof stat === 'number'){
-        return 'out'
-      } else {
-        return 'in'
-      }
     }
   )
 
-  var textPositionChange = changeDetector(
-    function(stat){
-      //if the text is inside the circle, sets its top position to match the apparent radius
-      if(typeof stat === 'number'){
-        var aspectRatio = dims[0] / dims[1]
-        textBox.style.top = ((.5 + realHeight(stat, aspectRatio)) * 100) + '%'
-      }
-      //update the in-or-out status of the text
-      textStatus(stat)
-    },
-    function(radius, distance){
+  updater(
+    subset(model, 'radius', 'distance', 'dims', 'textLength'),
+    function(states){
+      var radius = states.radius
+      var distance = states.distance
+      var dims = states.dims
+
       var circleDiameter = 2 * dims[0] * radius / distance
 
       //if the text is too large to fit in the circle, it will need to go outside the circle
       //if it is outside the circle, we will need to change its position everytime the radius changes
       //if it is inside the circle, its positions will remain static, so we only need to make
       //a change when it goes from outside the circle to inside
-      if(circleDiameter < textLength + 4){
+      if(circleDiameter < states.textLength + 4){
         //return the apparent radius
         return radius / distance
       } else {
         return 'in'
       }
+    },
+    function(stat, states){
+      //if the text is inside the circle, sets its top position to match the apparent radius
+      if(typeof stat === 'number'){
+        var aspectRatio = states.dims[0] / states.dims[1]
+        textBox.style.top = ((.5 + realHeight(stat, aspectRatio)) * 100) + '%'
+      }
+      //update the in-or-out status of the text
+      model.textStatus.update(stat)
     }
   )
 
+  updater(
+    subset(model, 'radius', 'distance'),
+    function(states){
+      return states.radius / states.distance
+    },
+    function(apparentRadius){
+      circle.setAttribute('r', apparentRadius)
+    }
+  )
   return function(radius, distance){
-    circle.setAttribute('r', radius / distance)
-
-    gallonDisplay(radius)
-    textPositionChange(radius, distance)
   }
 }
 

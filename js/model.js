@@ -11,7 +11,7 @@ Tracker.prototype.get = function(){
   return this.value
 }
 
-Tracker.protoype.subscribe = function(callback){
+Tracker.prototype.subscribe = function(callback){
   this.subscribers.push(callback)
 }
 
@@ -24,7 +24,7 @@ Tracker.prototype.update = function(newValue){
 
 function updater(trackers, reduce, action){
 
-  var state
+  var state = {}
   var reducedValue
 
   function update(tracker){
@@ -39,7 +39,28 @@ function updater(trackers, reduce, action){
   }
 
   Object.keys(trackers).forEach(function(tracker){
-    state[key] = trackers[tracker].get()
+    state[tracker] = trackers[tracker].get()
+  })
+
+  reducedValue = reduce(state)
+  action(reducedValue, state)
+
+  Object.keys(trackers).forEach(function(tracker){
     trackers[tracker].subscribe(update(tracker))
   })
+}
+
+function update(model, values){
+  Object.keys(values).forEach(function(key){
+    if(model[key] !== undefined)
+      model[key].update(values[key])
+  })
+}
+
+function subset(set){
+  var ret = {}
+  for(var i = 1; i < arguments.length; i++){
+    ret[arguments[i]] = set[arguments[i]]
+  }
+  return ret
 }

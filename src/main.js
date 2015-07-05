@@ -19,6 +19,7 @@ var scripts = [
   'js/move.js',
   'js/sequence.js',
   'js/scene.js',
+  'js/model.js',
   'bower_components/angular/angular.min.js',
   'js/directives.js',
   'js/graphic.js',
