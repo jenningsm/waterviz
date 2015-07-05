@@ -101,20 +101,6 @@ function link($window){
   
     var oldScene = states
     var moveCircles = sequence(setter, states)
- 
-/*    var timeout
-    updater(
-      subset(model, 'dims'),
-      function(states){
-
-      },
-      function(){
-        clearTimeout(timeout)
-        timeout = setTimeout(function() {
-          var sceneSteps = getSteps(oldScene, getScene(
-        })
-      }
-    )*/
 
     updater(
       subset(model, 'values'),
@@ -135,17 +121,6 @@ function link($window){
     function valueChange(newv){
       model.values.update(newv)
     }
-    /*function valueChange(newv){
-      if(newv.right === undefined || newv.left === undefined)
-        return
-
-      var newScene = getScene(newv.left, newv.right, aspectRatio, oldScene.distance)
-      var sceneSteps = getSteps(oldScene, newScene)
-      oldScene = newScene
-
-      moveCircles.apply(this, sceneSteps)
-    }*/
-
     scope.$watch('values', valueChange, true)
   }
 }
