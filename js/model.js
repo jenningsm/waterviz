@@ -27,14 +27,31 @@ function updater(trackers, reduce, action){
   var state = {}
   var reducedValue
 
+  if(reduce === null){
+    reduce = function(x){ return x }
+  }
+
   function update(tracker){
     return function(value){
       state[tracker] = value
       var newReduced = reduce(state)
-      if(newReduced !== reducedValue){
-        action(newReduced, state)
-        reducedValue = newReduced
+
+      var different = false
+      if(Array.isArray(newReduced)){
+        newReduced.forEach(function(newReducedValue, index){
+          if(reducedValue[index] !== newReducedValue)
+            different = true
+        })
+      } else if (typeof newReduced === 'object'){
+        Object.keys(newReduced).forEach(function(key){
+          if(reducedValue[key] !== newReduced[key])
+            different = true
+        })
+      } else {
+        different = newReduced !== reducedValue
       }
+      action(newReduced, state)
+      reducedValue = newReduced
     }
   }
 

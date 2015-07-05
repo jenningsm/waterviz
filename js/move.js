@@ -51,7 +51,17 @@ MoveGen.prototype.position = function(){
 
 //begin the movement
 MoveGen.prototype.run = function(){
+
   this.currentTime = 0
+
+  if(!(this.totalTime > 0)){
+    this.mover(this.stop)
+    this.motion = function() { return 1 }
+    if(this.callback !== undefined)
+      this.callback()
+    return
+  }
+
   var speed = 1 / (60 * this.totalTime)
 
   this.motion = motionGen(this.accel, this.decel, this.maxSpeed)
@@ -65,9 +75,7 @@ MoveGen.prototype.run = function(){
       } else {
         this.mover(this.stop)
         if(this.callback !== undefined){
-          var hold = this.callback
-          this.callback = undefined
-          hold()
+          this.callback()
         }
       }
     }

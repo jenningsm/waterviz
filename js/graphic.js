@@ -10,6 +10,11 @@ app.directive('graphic', ['$window', function($window){
   }
 }])
 
+//the apparent distances are as a proportion of the
+//maximum of the the width and height of the svg element
+
+//these functions covert apparent distances into
+//proportions of a specific dimension of the svg element
 function realWidth(svgWidth, aspectRatio){
   return Math.max(1, 1 / aspectRatio) * svgWidth
 }
@@ -21,6 +26,7 @@ function link($window){
   return function(scope, el){
 
     var model = {
+      'values' : new Tracker(),
       'centerOffset' : new Tracker(0),
       'apparentCenterOffset' : new Tracker(0),
       'distance' : new Tracker(100),
@@ -82,8 +88,8 @@ function link($window){
       }
     )
 
-    radiusSetter(model['left-radius'], model['distance'], model['dims'], circles[0], textBoxes[0]),
-    radiusSetter(model['right-radius'], model['distance'], model['dims'], circles[1], textBoxes[1])
+    circleUpdater(model['left-radius'], model['distance'], model['dims'], circles[0], textBoxes[0]),
+    circleUpdater(model['right-radius'], model['distance'], model['dims'], circles[1], textBoxes[1])
 
     var setter = function(positions){
       update(model, positions)
@@ -96,7 +102,40 @@ function link($window){
     var oldScene = states
     var moveCircles = sequence(setter, states)
  
-    function valueChange(newv){ 
+/*    var timeout
+    updater(
+      subset(model, 'dims'),
+      function(states){
+
+      },
+      function(){
+        clearTimeout(timeout)
+        timeout = setTimeout(function() {
+          var sceneSteps = getSteps(oldScene, getScene(
+        })
+      }
+    )*/
+
+    updater(
+      subset(model, 'values'),
+      function(states){
+        return states.values
+      },
+      function(newv){
+        if(newv !== undefined && newv.right !== undefined && newv.left !== undefined){
+          var newScene = getScene(newv.left, newv.right, aspectRatio, oldScene.distance)
+          var sceneSteps = getSteps(oldScene, newScene)
+          oldScene = newScene
+  
+          moveCircles.apply(this, sceneSteps)  
+        }
+      }
+    )
+
+    function valueChange(newv){
+      model.values.update(newv)
+    }
+    /*function valueChange(newv){
       if(newv.right === undefined || newv.left === undefined)
         return
 
@@ -105,7 +144,7 @@ function link($window){
       oldScene = newScene
 
       moveCircles.apply(this, sceneSteps)
-    }
+    }*/
 
     scope.$watch('values', valueChange, true)
   }
@@ -117,7 +156,7 @@ function translate(element, x, y){
   element.style.webkitTransform = transform
 }
 
-function radiusSetter(radiusTracker, distanceTracker, dimTracker, circle, textBox){
+function circleUpdater(radiusTracker, distanceTracker, dimTracker, circle, textBox){
 
   var model = {
     'radius' : radiusTracker,
