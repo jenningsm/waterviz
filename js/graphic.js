@@ -22,6 +22,7 @@ function link($window){
 
     var model = {
       'centerOffset' : new Tracker(0),
+      'apparentCenterOffset' : new Tracker(0),
       'distance' : new Tracker(100),
       'left-radius' : new Tracker(0),
       'right-radius' : new Tracker(0),
@@ -53,18 +54,30 @@ function link($window){
       textBoxes.push(el[0].children[1].children[i])
     }
  
-    /* TODO: this needs to update on dims change */ 
+    // APPARENT CENTER OFFSET
     updater(
-      subset(model, 'centerOffset', 'distance', 'dims'),
+      subset(model, 'centerOffset', 'distance'),
       function(states){
         return states.centerOffset / states.distance
       },
       function(apparentCenterOffset, states){
-        var dims = states.dims
         for(var i = 0; i < 2; i++){
           var pos = (i === 0 ? -1 : 1) * apparentCenterOffset
+          model.apparentCenterOffset.update(apparentCenterOffset)
           circles[i].setAttribute('cx', .5 + pos)
-          textBoxes[i].style.left = (50 + 100 * realWidth(pos, dims[0] / dims[1])) + '%'
+        }
+      }
+    )
+
+    updater(
+      subset(model, 'apparentCenterOffset', 'dims'),
+      function(states){
+        return realWidth(states.apparentCenterOffset, states.dims[0] / states.dims[1])
+      },
+      function(realOffset, states){
+        for(var i = 0; i < 2; i++){
+          var pos = (i === 0 ? -1 : 1) * realOffset
+          textBoxes[i].style.left = (50 + 100 * pos) + '%'
         }
       }
     )
@@ -98,33 +111,6 @@ function link($window){
   }
 }
 
-/*
-  action and transform are both supposed to be functions
-
-  Returns a function that's meant to take a series of
-  inputs. That function will call action each time one
-  of those inputs is different than the last one passed in.
-  Additionally, if the transform argument is specified, then
-  each input will be passed through transform before it is
-  tested for equality and before it is passed to action (if at all).
-*/
-function changeDetector(action, transform){
-  if(transform === undefined)
-    transform = function(x) { return x }
-
-  var value
-
-  return function(){
-    var args = Array.prototype.slice.call(arguments)
-
-    var newTransformed = transform.apply(this, args)
-    if(newTransformed !== value){
-      value = newTransformed
-      action.apply(this, [value].concat(args))
-    }
-  }
-}
-
 function translate(element, x, y){
   var transform = 'translate(' + x + ',' + y + ')'
   element.style.transform = transform
@@ -135,6 +121,7 @@ function radiusSetter(radiusTracker, distanceTracker, dimTracker, circle, textBo
 
   var model = {
     'radius' : radiusTracker,
+    'apparentRadius' : new Tracker(0),
     'gallons' : new Tracker(0),
     'textStatus' : new Tracker('out'),
     'distance' : distanceTracker,
@@ -154,6 +141,7 @@ function radiusSetter(radiusTracker, distanceTracker, dimTracker, circle, textBo
     return rounded
   }
 
+  // TEXT LENGTH
   updater(
     subset(model, 'gallons'),
     function(states){
@@ -168,6 +156,7 @@ function radiusSetter(radiusTracker, distanceTracker, dimTracker, circle, textBo
     }
   )
 
+  // GALLONS
   updater(
     subset(model, 'radius'),
     function(states){
@@ -183,12 +172,7 @@ function radiusSetter(radiusTracker, distanceTracker, dimTracker, circle, textBo
   updater(
     subset(model, 'textStatus'),
     function(states){
-      var stat = states.textStatus
-      if(typeof stat === 'number'){
-        return 'out'
-      } else {
-        return 'in'
-      }
+      return states.textStatus
     },
     function(stat){
       if(stat === 'out'){
@@ -202,14 +186,13 @@ function radiusSetter(radiusTracker, distanceTracker, dimTracker, circle, textBo
     }
   )
 
+  // TEXT STATUS
   updater(
-    subset(model, 'radius', 'distance', 'dims', 'textLength'),
+    subset(model, 'apparentRadius', 'dims', 'textLength'),
     function(states){
-      var radius = states.radius
-      var distance = states.distance
       var dims = states.dims
 
-      var circleDiameter = 2 * dims[0] * radius / distance
+      var circleDiameter = 2 * dims[0] * states.apparentRadius
 
       //if the text is too large to fit in the circle, it will need to go outside the circle
       //if it is outside the circle, we will need to change its position everytime the radius changes
@@ -217,7 +200,7 @@ function radiusSetter(radiusTracker, distanceTracker, dimTracker, circle, textBo
       //a change when it goes from outside the circle to inside
       if(circleDiameter < states.textLength + 4){
         //return the apparent radius
-        return radius / distance
+        return realHeight(states.apparentRadius, dims[0] / dims[1])
       } else {
         return 'in'
       }
@@ -225,14 +208,14 @@ function radiusSetter(radiusTracker, distanceTracker, dimTracker, circle, textBo
     function(stat, states){
       //if the text is inside the circle, sets its top position to match the apparent radius
       if(typeof stat === 'number'){
-        var aspectRatio = states.dims[0] / states.dims[1]
-        textBox.style.top = ((.5 + realHeight(stat, aspectRatio)) * 100) + '%'
+        textBox.style.top = ((.5 + stat) * 100) + '%'
       }
       //update the in-or-out status of the text
-      model.textStatus.update(stat)
+      model.textStatus.update(typeof stat === 'number' ? 'out' : 'in')
     }
   )
 
+  // APPARENT RADIUS
   updater(
     subset(model, 'radius', 'distance'),
     function(states){
@@ -240,9 +223,8 @@ function radiusSetter(radiusTracker, distanceTracker, dimTracker, circle, textBo
     },
     function(apparentRadius){
       circle.setAttribute('r', apparentRadius)
+      model.apparentRadius.update(apparentRadius)
     }
   )
-  return function(radius, distance){
-  }
 }
 
