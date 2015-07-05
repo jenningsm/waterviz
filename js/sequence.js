@@ -76,7 +76,7 @@ function parallelMoves(setter, starts, stops, time, next){
   function interrupt(){
     var states = {}
     var pos = runner.interrupt()
-    Object.keys(setters).forEach(function(key){
+    Object.keys(starts).forEach(function(key){
       states[key] = specificPos(pos, key)
     })
     return states
