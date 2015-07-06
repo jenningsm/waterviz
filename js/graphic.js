@@ -27,13 +27,15 @@ function link($window){
 
     var model = {
       'values' : new Tracker(),
-      'centerOffset' : new Tracker(0),
-      'apparentCenterOffset' : new Tracker(0),
-      'distance' : new Tracker(100),
-      'left-radius' : new Tracker(0),
-      'right-radius' : new Tracker(0),
+      'centerOffset' : new Tracker(),
+      'apparentCenterOffset' : new Tracker(),
+      'distance' : new Tracker(),
+      'left-radius' : new Tracker(),
+      'right-radius' : new Tracker(),
       'dims' : new Tracker()
     }
+
+    var activators = []
 
     var aspectRatio  
 
@@ -48,6 +50,7 @@ function link($window){
     getDims()
   
 
+
     /* --------------------------------- */
 
  
@@ -61,7 +64,7 @@ function link($window){
     }
  
     // APPARENT CENTER OFFSET
-    updater(
+    activators.push(updater(
       subset(model, 'centerOffset', 'distance'),
       function(states){
         return states.centerOffset / states.distance
@@ -73,9 +76,9 @@ function link($window){
           circles[i].setAttribute('cx', .5 + pos)
         }
       }
-    )
+    ))
 
-    updater(
+    activators.push(updater(
       subset(model, 'apparentCenterOffset', 'dims'),
       function(states){
         return realWidth(states.apparentCenterOffset, states.dims[0] / states.dims[1])
@@ -86,41 +89,60 @@ function link($window){
           textBoxes[i].style.left = (50 + 100 * pos) + '%'
         }
       }
-    )
+    ))
 
-    circleUpdater(model['left-radius'], model['distance'], model['dims'], circles[0], textBoxes[0]),
-    circleUpdater(model['right-radius'], model['distance'], model['dims'], circles[1], textBoxes[1])
+    activators.push(circleUpdater(model['left-radius'], model['distance'], model['dims'], circles[0], textBoxes[0]))
+    activators.push(circleUpdater(model['right-radius'], model['distance'], model['dims'], circles[1], textBoxes[1]))
+
+    var resizeTimeout
+
+/*    updater(){
+      subset(model, 'dims')
+      function(states){
+        
+      },
+      function(){
+
+      }
+    }*/
 
     var setter = function(positions){
-      update(model, positions)
+      updateModel(model, positions)
     }
   
     states = getScene(0, 0, aspectRatio, 0)
     states.distance = 100
     states.centerOffset = (1 / 6) * states.distance
   
-    var oldScene = states
+    updateModel(model, states)
     var moveCircles = sequence(setter, states)
 
-    updater(
+    activators.push(updater(
       subset(model, 'values'),
       function(states){
         return states.values
       },
       function(newv){
         if(newv !== undefined && newv.right !== undefined && newv.left !== undefined){
-          var newScene = getScene(newv.left, newv.right, aspectRatio, oldScene.distance)
-          var sceneSteps = getSteps(oldScene, newScene)
-          oldScene = newScene
+          var newScene = getScene(newv.left, newv.right, aspectRatio, model.distance.get())
+          var sceneSteps = getSteps(
+            getModel(model, 'centerOffset', 'left-radius', 'right-radius', 'distance'),
+            newScene
+          )
   
           moveCircles.apply(this, sceneSteps)  
         }
       }
-    )
+    ))
 
     function valueChange(newv){
       model.values.update(newv)
     }
+    valueChange({'left' : 0, 'right' : 0})
+    for(var i = 0; i < activators.length; i++){
+      activators[i]()
+    }
+
     scope.$watch('values', valueChange, true)
   }
 }
@@ -135,13 +157,15 @@ function circleUpdater(radiusTracker, distanceTracker, dimTracker, circle, textB
 
   var model = {
     'radius' : radiusTracker,
-    'apparentRadius' : new Tracker(0),
-    'gallons' : new Tracker(0),
-    'textStatus' : new Tracker('out'),
+    'apparentRadius' : new Tracker(),
+    'gallons' : new Tracker(),
+    'textStatus' : new Tracker(),
     'distance' : distanceTracker,
     'dims' : dimTracker,
-    'textLength' : new Tracker(0)
+    'textLength' : new Tracker()
   }
+
+  var activators = []
 
   function roundValue(value){
     var rounded = 0
@@ -156,7 +180,7 @@ function circleUpdater(radiusTracker, distanceTracker, dimTracker, circle, textB
   }
 
   // TEXT LENGTH
-  updater(
+  activators.push(updater(
     subset(model, 'gallons'),
     function(states){
       var gallons = states.gallons
@@ -168,10 +192,10 @@ function circleUpdater(radiusTracker, distanceTracker, dimTracker, circle, textB
     function(){
       model.textLength.update(textBox.children[0].clientWidth)
     }
-  )
+  ))
 
   // GALLONS
-  updater(
+  activators.push(updater(
     subset(model, 'radius'),
     function(states){
       var radius = states.radius
@@ -181,9 +205,9 @@ function circleUpdater(radiusTracker, distanceTracker, dimTracker, circle, textB
       textBox.children[0].innerHTML = gallons + ' gallons'
       model.gallons.update(gallons)
     }
-  )
+  ))
 
-  updater(
+  activators.push(updater(
     subset(model, 'textStatus'),
     function(states){
       return states.textStatus
@@ -198,10 +222,10 @@ function circleUpdater(radiusTracker, distanceTracker, dimTracker, circle, textB
         textBox.style.color = 'white'
       }
     }
-  )
+  ))
 
   // TEXT STATUS
-  updater(
+  activators.push(updater(
     subset(model, 'apparentRadius', 'dims', 'textLength'),
     function(states){
       var dims = states.dims
@@ -227,10 +251,10 @@ function circleUpdater(radiusTracker, distanceTracker, dimTracker, circle, textB
       //update the in-or-out status of the text
       model.textStatus.update(typeof stat === 'number' ? 'out' : 'in')
     }
-  )
+  ))
 
   // APPARENT RADIUS
-  updater(
+  activators.push(updater(
     subset(model, 'radius', 'distance'),
     function(states){
       return states.radius / states.distance
@@ -239,6 +263,12 @@ function circleUpdater(radiusTracker, distanceTracker, dimTracker, circle, textB
       circle.setAttribute('r', apparentRadius)
       model.apparentRadius.update(apparentRadius)
     }
-  )
+  ))
+
+  return function(){
+    for(var i = 0; i < activators.length; i++){
+      activators[i]()
+    }
+  }
 }
 

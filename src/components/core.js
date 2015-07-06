@@ -9,8 +9,7 @@ module.exports = function(){
   var title =  el('div').style(
     sty('width', '100%'),
     sty('text-align', 'center'),
-    sty('line-height', '1.5'),
-    stys.font(fonts.main)
+    sty('line-height', '1.5')
   )
   .content(
     el('span').style(
