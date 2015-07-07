@@ -16,11 +16,11 @@ var body = el('body').style({
 )
 
 var scripts = [
+  'js/util.js',
   'js/motion.js',
   'js/move.js',
   'js/sequence.js',
   'js/scene.js',
-  'js/util.js',
   'js/model.js',
   'bower_components/angular/angular.min.js',
   'js/directives.js',

@@ -28,7 +28,7 @@ function updater(trackers, reduce, action){
 
   var state = {}
   var reducedValue
-  var activated = false
+  var inputsDefined = false
 
   if(reduce === null){
     reduce = function(x){ return x }
@@ -38,7 +38,9 @@ function updater(trackers, reduce, action){
     var newReduced = shallowCopy(reduce(state))
 
     var different = false
-    if(Array.isArray(newReduced)){
+    if(reducedValue === undefined){
+      different = true
+    } else if(Array.isArray(newReduced)){
       newReduced.forEach(function(newReducedValue, index){
         if(reducedValue[index] !== newReducedValue)
           different = true
@@ -53,7 +55,7 @@ function updater(trackers, reduce, action){
     }
     if(different){
       action(newReduced, state)
-      reducedValue = newReduced
+      reducedValue = shallowCopy(newReduced)
     }
   }
 
@@ -61,7 +63,15 @@ function updater(trackers, reduce, action){
     return function(value){
       state[tracker] = value
 
-      if(activated)
+      if(!inputsDefined){
+        inputsDefined = true
+        Object.keys(trackers).forEach(function(key){
+          if(state[key] === undefined)
+            inputsDefined = false
+        })
+      }
+
+      if(inputsDefined)
         reevaluate()
     }
   }
@@ -70,11 +80,6 @@ function updater(trackers, reduce, action){
     trackers[tracker].subscribe(update(tracker))
   })
 
-  return function(){
-    activated = true
-    reducedValue = shallowCopy(reduce(state))
-    action(reducedValue, state)
-  }
 }
 
 function updateModel(model, values){

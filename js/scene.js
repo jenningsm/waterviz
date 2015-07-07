@@ -70,14 +70,6 @@ function getScene(leftValue, rightValue, aspectRatio, currentDist){
   return ret
 }
 
-function copyObject(o){
-  var ret = {}
-  Object.keys(o).forEach(function(key){
-    ret[key] = o[key]
-  })
-  return ret
-}
-
 /*
   Takes a new scene state and an old scene state and returns an array
   of scene states. This array is a series of steps from the old scene to
@@ -107,7 +99,7 @@ function getSteps(oldScene, newScene){
   }
 
   var sceneSteps = []
-  var currentStep = copyObject(oldScene)
+  var currentStep = shallowCopy(oldScene)
   for(var i = 0; i < steps.length; i++){
     if(!Array.isArray(steps[i]))
       steps[i] = [steps[i]]
@@ -118,7 +110,7 @@ function getSteps(oldScene, newScene){
       currentStep[steps[i][j]] = newScene[steps[i][j]]
       time += timeFunctions[i](oldScene[steps[i][j]], newScene[steps[i][j]])
     }
-    var newStep = copyObject(currentStep)
+    var newStep = shallowCopy(currentStep)
     newStep.time = time
 
     sceneSteps.push(newStep)
