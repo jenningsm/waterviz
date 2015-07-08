@@ -35,11 +35,8 @@ function link($window){
       'dims' : new Tracker()
     }
 
-    var aspectRatio  
-
     function getDims(){
       var dims = [el[0].offsetWidth, el[0].offsetHeight]
-      aspectRatio =  dims[0] / dims[1]
       model['dims'].update(dims)
     }
   
@@ -96,7 +93,8 @@ function link($window){
       updateModel(model, positions)
     }
   
-    states = getScene(0, 0, aspectRatio, 0)
+    var dims = model.dims.get()
+    states = getScene(0, 0, dims[0] / dims[1], 0)
     states.distance = 100
     states.centerOffset = (1 / 6) * states.distance
   
@@ -111,7 +109,8 @@ function link($window){
         var distance = model.distance.get()
         if(distance === undefined)
           distance = 0
-        var newScene = getScene(newv.left, newv.right, aspectRatio, distance)
+        var dims = model.dims.get()
+        var newScene = getScene(newv.left, newv.right, dims[0] / dims[1], distance)
         var sceneSteps = getSteps(
           getModel(model, 'centerOffset', 'left-radius', 'right-radius', 'distance'),
           newScene
@@ -160,15 +159,25 @@ function circleUpdater(radiusTracker, distanceTracker, dimTracker, circle, textB
     return rounded
   }
 
+  function numDigits(x){
+    if(x < 1)
+      return 1
+
+    var i = 1
+    var a = 10
+    while(a < x){
+      i++
+      a *= 10
+    }
+    return i
+  }
+
   // TEXT LENGTH
   updater(
     subset(model, 'gallons'),
     function(states){
       var gallons = states.gallons
-      if(gallons < 1)
-        return 1
-
-      return 1 + Math.floor(Math.log(gallons) / Math.LN10)
+      return numDigits(gallons)
     },
     function(){
       model.textLength.update(textBox.children[0].clientWidth)

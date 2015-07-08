@@ -11,8 +11,8 @@ var body = el('body').style({
    'margin' : '0',
    'padding' : '0'
   },
-  //stys.font(font.fonts.main)
-  stys.font(font.fonts.offline)
+  stys.font(font.fonts.main)
+  //stys.font(font.fonts.offline)
 )
 
 var scripts = [
@@ -30,7 +30,7 @@ var scripts = [
 
 
 html.content(
-  require('./components/head.js')(['o.css'], {}/*font.fontLinks*/),
+  require('./components/head.js')(['o.css'], font.fontLinks),
   body.content(
     require('./components/core.js')()
   ),
