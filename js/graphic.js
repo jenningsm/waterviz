@@ -100,23 +100,43 @@ function link($window){
   
     var moveCircles = sequence(setter, states)
 
+    function toScene(leftValue, rightValue, dims){
+      var distance = model.distance.get()
+      if(distance === undefined)
+        distance = 0
+      var newScene = getScene(leftValue, rightValue, dims[0] / dims[1], distance)
+      var sceneSteps = getSteps(
+        getModel(model, 'centerOffset', 'left-radius', 'right-radius', 'distance'),
+        newScene
+      )
+
+      moveCircles.apply(this, sceneSteps)  
+    }
+
+    var resizeTimeout
+
+    updater(
+      subset(model, 'dims'),
+      function(states){
+        return states.dims
+      },
+      function(dims){
+        clearTimeout(resizeTimeout)
+        resizeTimeout = setTimeout(function(){
+          var values = model.values.get()
+          toScene(values.left, values.right, dims)
+        }, 500)
+      }
+    )
+
     updater(
       subset(model, 'values'),
       function(states){
         return states.values
       },
       function(newv){
-        var distance = model.distance.get()
-        if(distance === undefined)
-          distance = 0
         var dims = model.dims.get()
-        var newScene = getScene(newv.left, newv.right, dims[0] / dims[1], distance)
-        var sceneSteps = getSteps(
-          getModel(model, 'centerOffset', 'left-radius', 'right-radius', 'distance'),
-          newScene
-        )
-  
-        moveCircles.apply(this, sceneSteps)  
+        toScene(newv.left, newv.right, dims)
       }
     )
 
