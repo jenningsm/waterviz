@@ -95,7 +95,7 @@ function link($window){
   
     var dims = model.dims.get()
     states = getScene(0, 0, dims[0] / dims[1], 0)
-    states.distance = 100
+    states.distance = 1000
     states.centerOffset = (1 / 6) * states.distance
   
     var moveCircles = sequence(setter, states)
@@ -141,8 +141,10 @@ function link($window){
     )
 
     function valueChange(newv){
+      //conversion factor from million acre feet to billion gallons
+      var conversion = 325.8
       if(newv !== undefined && newv.left !== undefined && newv.right !== undefined)
-        model.values.update(newv)
+        model.values.update({left : newv.left * conversion, right : newv.right * conversion})
     }
 
     scope.$watch('values', valueChange, true)
@@ -169,9 +171,10 @@ function circleUpdater(radiusTracker, distanceTracker, dimTracker, circle, textB
 
   function roundValue(value){
     var rounded = 0
-    var precision = 10
+    var precision = 1000
+    var minFigures = 100
     
-    while(rounded === 0 && precision >= 1){
+    while(precision >= 1 && (rounded === 0 || value / precision < minFigures)){
       var rounded = Math.round(value / precision) * precision
       precision /= 10
     }
@@ -212,7 +215,7 @@ function circleUpdater(radiusTracker, distanceTracker, dimTracker, circle, textB
       return roundValue(.5 * Math.PI * radius * radius)
     },
     function(gallons){
-      textBox.children[0].innerHTML = gallons + ' gallons'
+      textBox.children[0].innerHTML = gallons + ' billion gallons'
       model.gallons.update(gallons)
     }
   )

@@ -82,16 +82,17 @@ function getSteps(oldScene, newScene){
   function timeFunction(constant){
     return function(oldv, newv){
       return Math.min(
-        Math.pow(Math.abs(oldv-newv), .4) * constant,
+        Math.pow(Math.abs(oldv-newv) * constant, .4),
         2
       )
     }
   }
 
+  var globalConstant = .04
   var timeFunctions = [
-    timeFunction(.13),
-    timeFunction(.18),
-    timeFunction(.35)
+    timeFunction(.02 * globalConstant),
+    timeFunction(.09 * globalConstant),
+    timeFunction(.35 * globalConstant)
   ]
   if(newScene.distance < oldScene.distance){
     steps.reverse()

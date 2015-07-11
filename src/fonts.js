@@ -11,11 +11,6 @@ var fonts = {
     name : 'Buda',
     weight : 300,
     color : 'black'
-  },
-  
-  offline : {
-    name : 'Arial',
-    weight : 200
   }
 }
 

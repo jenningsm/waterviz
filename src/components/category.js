@@ -13,7 +13,7 @@ module.exports = function(){
     sty('transition', 'font-size .5s')
   )
   .content(
-    '{{ category.name }}'
+    '{{ category.name | lowercase }}'
   )
 
 }

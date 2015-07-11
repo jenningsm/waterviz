@@ -1,15 +1,31 @@
 {
   "domestic" : {
-    "total domestic" : 20,
-    "showers" : 3.1,
-    "toilets" : 1.1,
-    "lawns" : 10.4,
-    "leaks" : 4
+    "Total Domestic" : 8.7,
+    "Lawns and Landscapes" : 3.57,
+    "Total Indoor Use" : 4.9,
+    "Commerical Indoor Use" : 1.6,
+    "Residential Indoor Use" : 3.3,
+    "Home Toilets" : 0.66,
+    "Home Faucets" : 0.594,
+    "Home Clothes Washers" : 0.594,
+    "Home Leaks" : 0.528,
+    "Showers" : 0.627
   },
   "agricultural" : {
-    "total agricultural" : 100.4,
-    "alfafa" : 40.2,
-    "beans" : 55,
-    "rice" : 14.3
+    "Total Agricultural" : 34.3,
+    "Alfafa" : 5.2,
+    "Almonds and Pistachios" : 3.8,
+    "Pasture" : 3.1,
+    "Rice" : 2.7,
+    "Corn" : 2.2,
+    "Vineyards" : 1.6,
+    "Subtropical Trees" : 1.4,
+    "Cotton" : 0.9,
+    "Grain" : 0.8,
+    "Processing Tomato" : 0.7,
+    "Onion and Garlic" : 0.2,
+    "Dry Bean" : 0.2,
+    "Fresh Tomato" : 0.1,
+    "Potato" : 0.1
   }
 }
