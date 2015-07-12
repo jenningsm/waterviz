@@ -5,12 +5,6 @@ var fonts = {
     name : 'Yanone Kaffeesatz',
     weight : 200,
     color : colors.grey
-  },
-
-  title : {
-    name : 'Buda',
-    weight : 300,
-    color : 'black'
   }
 }
 

@@ -1,11 +1,12 @@
 
 var colors = {
-  'primary' : [230, 14, 14],
-  'secondary' : [220, 172, 36],
   'grey' : [50, 50, 50]
 }
 
-var colorStrings = {}
+var colorStrings = {
+  'primary' : 'blue',
+  'secondary' : 'beige'
+}
 
 Object.keys(colors).forEach(function(color){
   var values = colors[color]

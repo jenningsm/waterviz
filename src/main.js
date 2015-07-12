@@ -9,6 +9,7 @@ var html = el('html', {'ng-app' : 'app'}).style(
 
 var body = el('body').style({
    'margin' : '0',
+   'margin-bottom' : '35px',
    'padding' : '0'
   },
   stys.font(font.fonts.main)
@@ -30,7 +31,7 @@ var scripts = [
 
 
 html.content(
-  require('./components/head.js')(['o.css'], font.fontLinks),
+  require('./components/head.js')(['o.css', 'styles.css'], font.fontLinks),
   body.content(
     require('./components/core.js')()
   ),

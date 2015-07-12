@@ -12,14 +12,14 @@ module.exports = function(){
     sty('line-height', '1.5')
   )
   .content(
-    el('span').style(
+    el('div').style(
       sty('font-size', '5em'),
-      sty('border-bottom', '1px solid ' + colors.grey)
+      sty('width', 'fit-content'),
+      sty('margin', '0 auto')
     )
     .content(
-      'Where the water goes'
+      'Where the Water Goes'
     ),
-    '<br/>',
     el('span').style(
       sty('font-size', '2em')
     )
@@ -40,10 +40,50 @@ module.exports = function(){
     )
   )
 
+  var sources =  el('div').style(
+    sty('width', '100%'),
+    sty('text-align', 'center'),
+    sty('line-height', '1.5')
+  )
+  .content(
+    el('div').style(
+      sty('font-size', '2.5em'),
+      sty('width', 'fit-content'),
+      sty('margin', '0 auto')
+    )
+    .content(
+      'Sources'
+    ),
+    el('div').style(
+      sty('width', '80%'),
+      sty('font-size', '1.25em'),
+      sty('margin', '1em auto')
+    )
+    .content(
+      el('a', {'href' : 'http://pacinst.org/wp-content/uploads/sites/21/2015/04/CA-Ag-Water-Use.pdf'})
+      .content('California Agricultural Water Use: Key Background Information'),
+     ' by the Pacific Institute, and ',
+     el('a', {'href' : 'http://www.irwd.com/images/pdf/save-water/CaSingleFamilyWaterUseEfficiencyStudyJune2011.pdf'})
+     .content('California Single Family Water Use Efficiency Study'),
+     ' by the Irvine Ranch Water District'
+    )
+   
+  )
+
+  function hr(){
+    return el('hr/').style(
+      sty('width', '75px'),
+      sty('margin', '40px auto')
+    )
+  }
+
   return el('div').content(
     title,
+    hr(),
     el('water-viz'),
-    el('div').style(stys.dims('100%', '100px'))
+    hr(),
+    sources,
+    hr()
   ).style(
     sty('min-width', '600px')
   )

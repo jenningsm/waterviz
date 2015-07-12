@@ -12,7 +12,8 @@ module.exports = function(){
   var box = el('div').style(
     sty('width', '100%'),
     sty('position', 'relative'),
-    sty('background', 'beige')
+    //sty('background', 'beige')
+    sty('background', colors.secondary)
   )
   .content(
     whole()
