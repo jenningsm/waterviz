@@ -19,7 +19,8 @@ module.exports = function(){
       el('div').style(
         sty('transform', 'translate(-50%, -50%)'),
         sty('font-size', '1.3em'),
-        sty('width', 'max-content')
+        sty('width', 'max-content'),
+        sty('white-space', 'nowrap')
       )
       .content('text')
    )

@@ -91,7 +91,7 @@ function getSteps(oldScene, newScene){
   var globalConstant = .04
   var timeFunctions = [
     timeFunction(.02 * globalConstant),
-    timeFunction(.09 * globalConstant),
+    timeFunction(.11 * globalConstant),
     timeFunction(.35 * globalConstant)
   ]
   if(newScene.distance < oldScene.distance){

@@ -2,14 +2,11 @@
   "domestic" : {
     "Total Domestic" : 8.7,
     "Lawns and Landscapes" : 3.57,
-    "Total Indoor Use" : 4.9,
-    "Commerical Indoor Use" : 1.6,
-    "Residential Indoor Use" : 3.3,
     "Home Toilets" : 0.66,
     "Home Faucets" : 0.594,
     "Home Clothes Washers" : 0.594,
     "Home Leaks" : 0.528,
-    "Showers" : 0.627
+    "Home Showers" : 0.627
   },
   "agricultural" : {
     "Total Agricultural" : 34.3,
