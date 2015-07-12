@@ -66,7 +66,7 @@ function category(side){
 
   responsive(cat, small, big)
 
-  cat.assign(sel('$ > *').style(sty('margin', '.05em .2em')), [0])
+  cat.assign(sel('$ > *').style(sty('margin', '.05em .25em')), [0])
 
   return cat
 }

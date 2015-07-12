@@ -44,5 +44,7 @@ module.exports = function(){
     title,
     el('water-viz'),
     el('div').style(stys.dims('100%', '100px'))
+  ).style(
+    sty('min-width', '600px')
   )
 }
